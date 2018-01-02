@@ -1,8 +1,9 @@
-module Update exposing (..)
+module Update exposing (update)
 
 import Msgs exposing (Msg(..))
 import Models exposing (Model, Building, Upgrade)
-
+import Time exposing (inSeconds)
+import StartData exposing (tick)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -11,11 +12,12 @@ update msg model =
             ({ model | counter = model.counter + model.amountPerClick }, Cmd.none)
 
         Tick _ ->
-            if model.amountPerTick > 0
-            then
-            ({model | counter = model.counter + model.amountPerTick}, Cmd.none)
-            else
-            (model, Cmd.none)  
+            (performTick model, Cmd.none)
+            -- if model.amountPerTick > 0
+            -- then
+            --     ({model | counter = model.counter + model.amountPerTick}, Cmd.none)
+            -- else
+            --     (model, Cmd.none)  
 
         BuyBuilding building ->
             if model.counter < building.cost
@@ -42,7 +44,11 @@ updateBuildings newBuilding model =
                 (\building ->
                     if building.id == newBuilding.id
                     then
-                        { building | amount = (building.amount + 1), cost = toFloat (round (building.cost * 1.3)) }
+                        if building.isTemp
+                        then
+                            { building | amount = (building.amount + 1), cost = calculateBuildingCost building.initialCost building.costModifier building.amount, temp = (building.tempTime :: building.temp) }
+                        else
+                            { building | amount = (building.amount + 1), cost = calculateBuildingCost building.initialCost building.costModifier building.amount  }
                     else
                         building
                 )
@@ -50,7 +56,6 @@ updateBuildings newBuilding model =
     in
         { model | 
             buildings = newBuildings
-            , amountPerTick = calculateTick newBuildings
             , counter = model.counter - newBuilding.cost
         }
 
@@ -70,19 +75,19 @@ updateUpgrades newUpgrade model =
 
         newBuildings = 
             List.map
-            (\building ->
-            if building.id == newUpgrade.buildingId
-            then
-                {building | modifier = building.modifier + newUpgrade.modifier}
-            else
-                building
-            )
-            model.buildings
+                (\building ->
+                if building.id == newUpgrade.buildingId
+                then
+                    {building | modifier = building.modifier + newUpgrade.modifier}
+                else
+                    building
+                )
+                model.buildings
     in
         { model |
             upgrades = newUpgrades
             , buildings = newBuildings
-            , amountPerTick = calculateTick newBuildings
+            , counter = model.counter - newUpgrade.cost
         }
 
 calculateTick : List Building -> Float
@@ -90,10 +95,54 @@ calculateTick buildings =
     List.sum
         (List.map
             (\building ->
-            if building.amount > 0
-            then
-                ((building.value / 10) * building.modifier) * building.amount
-            else
-                0
+                if building.amount > 0
+                then
+                    ((building.value * (inSeconds tick)) * building.modifier) * building.amount
+                else
+                    0
             )
             buildings)
+
+performTick : Model -> Model
+performTick model =
+    let
+        newTick =
+            calculateTick model.buildings
+
+        newBuildings =
+            List.map
+                (\building ->
+                    if building.isTemp
+                    then
+                        buildingLength building
+                    else
+                        building
+                )
+                model.buildings
+    in
+        {
+            model |
+                counter = model.counter + newTick
+                , buildings = newBuildings
+                , amountPerTick = newTick
+        }
+
+buildingLength : Building -> Building
+buildingLength building =
+    let
+        newTemp =
+            List.filterMap
+                (\temp ->
+                    if temp < (inSeconds tick)
+                    then
+                        Nothing
+                    else
+                        Just (temp - (inSeconds tick))
+                )
+                building.temp
+    in
+        { building | temp = newTemp, amount = toFloat(List.length newTemp), cost = calculateBuildingCost building.initialCost building.costModifier (toFloat(List.length newTemp)) }
+
+calculateBuildingCost : Float -> Float -> Float -> Float
+calculateBuildingCost initialCost modifier amount =
+    toFloat (round (initialCost * ( 1 + modifier )^amount))

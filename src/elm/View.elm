@@ -1,8 +1,8 @@
-module View exposing (..)
+module View exposing (view)
 
 import Html exposing (Html, div, text, button)
 import Html.Events exposing (onClick)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 import Msgs exposing (Msg)
 import Models exposing (Model, Building)
 
@@ -75,12 +75,12 @@ viewBuilding : Models.Building -> Html Msg
 viewBuilding building =
     div [] 
     [
-        button [ class "btn btn-primary", onClick (Msgs.BuyBuilding building) ] [ text (buyBuildingButtonText building) ] 
+        button [ class "btn btn-primary", onClick (Msgs.BuyBuilding building), style [("white-space", "unset"), ("height", "unset")] ] [ text (buyBuildingButtonText building) ] 
     ]
 
 buyBuildingButtonText : Models.Building -> String
 buyBuildingButtonText building =
-    building.name ++ " (+" ++ (toString (building.value * building.modifier)) ++  " clicks per second) (cost " ++ (toString building.cost) ++ ") (owned: " ++ (toString building.amount) ++ ")"
+    building.name ++ " (+" ++ (toString (building.value * building.modifier)) ++  " clicks per second): " ++ building.description ++ " (cost " ++ (toString building.cost) ++ ") (owned: " ++ (toString building.amount) ++ ")"
 
 viewUpgrades : List Models.Upgrade -> List (Html Msg)
 viewUpgrades upgrades =

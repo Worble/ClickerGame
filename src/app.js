@@ -1,6 +1,7 @@
 'use strict';
 
 require('spectre.css/dist/spectre.css');
+require('./app.css');
 // require('font-awesome/css/font-awesome.css');
 
 // Require index.html so it gets copied to dist

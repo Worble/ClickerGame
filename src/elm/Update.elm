@@ -4,6 +4,9 @@ import Msgs exposing (Msg(..))
 import Models exposing (Model, Building, Upgrade)
 import Time exposing (inSeconds)
 import StartData exposing (tick)
+import Ports exposing (doload, save)
+import Decoders exposing (modelDecoder)
+import Json.Decode exposing (decodeString)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -30,6 +33,19 @@ update msg model =
 
         CastSpell spell ->
             ({ model | counter = model.counter + spell.value, mana = model.mana - spell.cost }, Cmd.none)
+
+        Save ->
+            ( model, save (toString model) )
+
+        Doload ->
+            ( model, doload() )
+
+        Load value ->
+            case decodeString modelDecoder value of
+                Ok value ->
+                    (value, Cmd.none)
+                Err _ ->
+                    (model, Cmd.none)
 
         NoOp ->
             (model, Cmd.none)

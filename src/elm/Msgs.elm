@@ -9,4 +9,7 @@ type Msg
     | BuyBuilding Building
     | BuyUpgrade Upgrade
     | CastSpell Spell
+    | Save
+    | Load String
+    | Doload
     | NoOp

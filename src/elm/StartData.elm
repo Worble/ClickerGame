@@ -3,6 +3,11 @@ module StartData exposing (..)
 import Models exposing (Model, Building, Upgrade, Spell)
 import Time exposing (Time, millisecond)
 
+model : Model
+model =
+    { counter = 0, mana = 10, maxMana = 10, manaPerTick = (1 * (Time.inSeconds tick)), amountPerTick = 0
+    , amountPerClick = 1, buildings = buildings, upgrades = upgrades, spells = spells}
+
 tick : Time
 tick =
     millisecond*100

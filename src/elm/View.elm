@@ -13,7 +13,7 @@ view model =
     [ 
         div [ class "columns" ]
         [
-            div [ class "column col-sm-12 col-6" ]
+            div [ class "column col-md-12 col-6" ]
             [
                 div [ class "columns" ]
                 [ 
@@ -52,8 +52,16 @@ view model =
                     , div [ class "column col-12" ]
                         (List.map viewSpell model.spells)
                 ]
+                , div [ class "columns" ]
+                [
+                    div [ class "column col-12"]
+                    [
+                        button[ class "btn btn-primary", onClick Msgs.Save ] [ text "Save" ]
+                        , button[ class "btn btn-primary", onClick Msgs.Doload ] [ text "Load" ]
+                    ]
+                ]
             ]
-            , div [ class "column col-sm-12 col-6" ]
+            , div [ class "column col-md-12 col-6" ]
             [ 
                 div [ class "columns" ]
                 [ 

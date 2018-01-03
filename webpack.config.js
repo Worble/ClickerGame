@@ -1,4 +1,5 @@
 var path = require("path");
+var webpack = require("webpack");
 
 module.exports = {
   entry: {
@@ -49,5 +50,10 @@ module.exports = {
     stats: { colors: true },
   },
 
-
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin({
+      include: /\.js$/,
+      minimize: true
+    })
+  ]
 };

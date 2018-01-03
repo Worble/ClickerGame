@@ -19,32 +19,38 @@ view model =
                 [ 
                     div [ class "column col-12" ]
                     [ 
-                        text "Count/second: "
-                        , text (toString (round (model.amountPerTick * 10))) 
+                        text ("Corpses/second: " ++ (model.amountPerTick * 10 |> round |> toString))
                     ]
                 ]
                 , div [ class "columns" ]
                 [ 
                     div [ class "column col-12" ]
                     [ 
-                        text "Current Count: "
-                        , text (toString (round model.counter)) 
+                        text ("Current Corpses: " ++ (round model.counter |> toString))
                     ]
                 ]
                 , div [ class "columns" ]
                 [ 
                     div [ class "column col-12" ]
                     [ 
-                        text "Each manual click is worth: "
-                        , text (toString model.amountPerClick) 
+                        text ("Current Mana: " ++ (round model.mana |> toString) ++ "/" ++ (round model.maxMana |> toString))
+                    ]
+                ]
+                , div [ class "columns" ]
+                [ 
+                    div [ class "column col-12" ]
+                    [ 
+                        text ("Mana/Second: " ++ (model.manaPerTick * 10 |> round |> toString))
                     ]
                 ]
                 , div [ class "columns" ]
                 [
-                    div [ class "column col-12" ]
+                    div [ class "column col-12"]
                     [ 
-                        button [ class "btn", onClick Msgs.Click ] [ text "Increment Counter" ]
+                        text "Spells" 
                     ]
+                    , div [ class "column col-12" ]
+                        (List.map viewSpell model.spells)
                 ]
             ]
             , div [ class "column col-sm-12 col-6" ]
@@ -56,7 +62,7 @@ view model =
                         text "Upgrades" 
                     ]
                     , div [ class "column col-12"]
-                     (viewUpgrades model.upgrades)
+                        (viewUpgrades model.upgrades)
                 ]
                 , div [ class "columns" ]
                 [ 
@@ -74,13 +80,12 @@ view model =
 viewBuilding : Models.Building -> Html Msg
 viewBuilding building =
     div [] 
-    [
-        button [ class "btn btn-primary", onClick (Msgs.BuyBuilding building), style [("white-space", "unset"), ("height", "unset")] ] [ text (buyBuildingButtonText building) ] 
+    [ button [ class "btn btn-primary", onClick (Msgs.BuyBuilding building), style [("white-space", "unset"), ("height", "unset")] ] [ text (buyBuildingButtonText building) ] 
     ]
 
 buyBuildingButtonText : Models.Building -> String
 buyBuildingButtonText building =
-    building.name ++ " (+" ++ (toString (building.value * building.modifier)) ++  " clicks per second): " ++ building.description ++ " (cost " ++ (toString building.cost) ++ ") (owned: " ++ (toString building.amount) ++ ")"
+    building.name ++ " (+" ++ (toString (building.value * building.modifier)) ++  " corpses/second): " ++ building.description ++ " (cost " ++ (toString building.cost) ++ ") (owned: " ++ (toString building.amount) ++ ")"
 
 viewUpgrades : List Models.Upgrade -> List (Html Msg)
 viewUpgrades upgrades =
@@ -101,10 +106,19 @@ viewUpgrades upgrades =
 viewUpgrade : Models.Upgrade -> Html Msg
 viewUpgrade upgrade =
     div [] 
-    [
-        button [ class "btn", onClick (Msgs.BuyUpgrade upgrade) ] [ text (buyUpgradeButtonText upgrade) ] 
+    [ button [ class "btn", onClick (Msgs.BuyUpgrade upgrade) ] [ text (buyUpgradeButtonText upgrade) ] 
     ]
 
 buyUpgradeButtonText : Models.Upgrade -> String
 buyUpgradeButtonText upgrade =
     upgrade.name ++ ": " ++ upgrade.description ++ " (cost " ++ (toString upgrade.cost) ++ ")"
+
+viewSpell : Models.Spell -> Html Msg
+viewSpell spell =
+    div []
+    [ button [ class "btn", onClick (Msgs.CastSpell spell) ] [ text (castSpellText spell) ]
+    ]
+
+castSpellText : Models.Spell -> String
+castSpellText spell =
+    spell.name ++ " (+" ++ toString spell.value ++ " corpses): " ++ spell.description ++ " (cost: " ++ toString spell.cost ++ " mana)"

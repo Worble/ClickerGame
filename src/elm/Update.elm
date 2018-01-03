@@ -12,12 +12,7 @@ update msg model =
             ({ model | counter = model.counter + model.amountPerClick }, Cmd.none)
 
         Tick _ ->
-            (performTick model, Cmd.none)
-            -- if model.amountPerTick > 0
-            -- then
-            --     ({model | counter = model.counter + model.amountPerTick}, Cmd.none)
-            -- else
-            --     (model, Cmd.none)  
+            (performTick model, Cmd.none) 
 
         BuyBuilding building ->
             if model.counter < building.cost
@@ -33,8 +28,11 @@ update msg model =
             else
                 (updateUpgrades upgrade model, Cmd.none)
 
+        CastSpell spell ->
+            ({ model | counter = model.counter + spell.value, mana = model.mana - spell.cost }, Cmd.none)
+
         NoOp ->
-            ( model, Cmd.none )
+            (model, Cmd.none)
 
 updateBuildings : Building -> Model -> Model
 updateBuildings newBuilding model =
@@ -46,9 +44,15 @@ updateBuildings newBuilding model =
                     then
                         if building.isTemp
                         then
-                            { building | amount = (building.amount + 1), cost = calculateBuildingCost building.initialCost building.costModifier building.amount, temp = (building.tempTime :: building.temp) }
+                            { building | 
+                                amount = (building.amount + 1)
+                                , cost = calculateBuildingCost building.initialCost building.costModifier building.amount
+                                , temp = (building.tempTime :: building.temp) }
                         else
-                            { building | amount = (building.amount + 1), cost = calculateBuildingCost building.initialCost building.costModifier building.amount  }
+                            { building | 
+                                amount = (building.amount + 1)
+                                , cost = calculateBuildingCost building.initialCost building.costModifier building.amount  
+                            }
                     else
                         building
                 )
@@ -120,11 +124,14 @@ performTick model =
                 )
                 model.buildings
     in
-        {
-            model |
-                counter = model.counter + newTick
-                , buildings = newBuildings
-                , amountPerTick = newTick
+        { model |
+            counter = model.counter + newTick
+            , buildings = newBuildings
+            , amountPerTick = newTick
+            , mana = if model.mana < model.maxMana then
+                        model.mana + model.manaPerTick
+                    else
+                        model.mana
         }
 
 buildingLength : Building -> Building
@@ -141,7 +148,10 @@ buildingLength building =
                 )
                 building.temp
     in
-        { building | temp = newTemp, amount = toFloat(List.length newTemp), cost = calculateBuildingCost building.initialCost building.costModifier (toFloat(List.length newTemp)) }
+        { building | 
+            temp = newTemp, amount = toFloat(List.length newTemp)
+            , cost = calculateBuildingCost building.initialCost building.costModifier (toFloat(List.length newTemp)) 
+        }
 
 calculateBuildingCost : Float -> Float -> Float -> Float
 calculateBuildingCost initialCost modifier amount =

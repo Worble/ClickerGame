@@ -5,6 +5,10 @@ import Time exposing (Time)
 type alias Model =
     { 
         counter : Float
+        , mana : Float
+        , maxMana : Float
+        , manaPerTick : Float
+        , spells : List Spell
         , amountPerTick : Float
         , amountPerClick : Float
         , buildings : List Building
@@ -34,6 +38,16 @@ type alias Upgrade =
         , cost : Float
         , buildingId : Int
         , bought : Bool
+        , name : String
+        , description : String
+    }
+
+type alias Spell =
+    {
+        id : Int
+        , cost : Float
+        , value : Float
+        , cooldown : Float
         , name : String
         , description : String
     }

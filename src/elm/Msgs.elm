@@ -1,6 +1,6 @@
 module Msgs exposing (..)
 import Time exposing (Time)
-import Models exposing (Building, Upgrade)
+import Models exposing (Building, Upgrade, Spell)
 
 
 type Msg
@@ -8,4 +8,5 @@ type Msg
     | Tick Time
     | BuyBuilding Building
     | BuyUpgrade Upgrade
+    | CastSpell Spell
     | NoOp

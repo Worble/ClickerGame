@@ -1,6 +1,6 @@
 module StartData exposing (..)
 
-import Models exposing (Model, Building, Upgrade)
+import Models exposing (Model, Building, Upgrade, Spell)
 import Time exposing (Time, millisecond)
 
 tick : Time
@@ -10,13 +10,23 @@ tick =
 buildings : List Building
 buildings =
     [ 
-        Models.Building 1 10 10 1 0 "Skeleton" "Lasts 10 seconds before melting" 1 0.3 True 10 []
+        { id = 1, cost = 10, initialCost = 10, value = 5, amount = 0, name = "Skeleton", 
+            description = "Lasts 10 seconds before melting", modifier = 1, costModifier = 0.3, 
+            isTemp = True,  tempTime = 10, temp = [] }
         , Models.Building 2 50 50 10 0 "Zombie" "2spook" 1 0.3 False 0 []
+
     ]
 
 upgrades : List Upgrade
 upgrades =
     [
-        Models.Upgrade 1 1 50 1 False "Upgrade Skeletons" "Double skeleton output"
+        { id = 1, modifier = 1, cost = 50, buildingId = 1, bought = False, name = "Upgrade Skeletons", description = "Double skeleton output" }
         , Models.Upgrade 2 1 250 2 False "Upgrade Zombies" "Double zombie output"
+    ]
+
+spells : List Spell
+spells =
+    [
+        { id = 1, cost = 1, value = 1, cooldown = 0, name = "Fireball", description = "Shoots fire yo" }
+        , Models.Spell 2 10 20 5 "Thunder Blast" "Shocking"
     ]
